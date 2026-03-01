@@ -12,7 +12,7 @@ import {
   SimulationLinkDatum,
 } from "d3-force";
 import { Settings, ChevronDown, ChevronUp } from "lucide-react";
-import { Event, allTopics } from "../../data/mock-events";
+import { Event } from "../../types/events";
 import "./EventMap.css";
 
 interface GraphNode extends SimulationNodeDatum {
@@ -67,9 +67,12 @@ export default function EventMap({ events, selectedEvent, selectedTopic, onSelec
     const width = container.clientWidth;
     const height = container.clientHeight;
 
-    // Determine which topics are actually used
-    const usedTopicLabels = new Set(events.flatMap((e) => e.tags));
-    const topics = allTopics.filter((t) => usedTopicLabels.has(t.label));
+    // Derive topics dynamically from event tags
+    const usedTopicLabels = [...new Set(events.flatMap((e) => e.tags))];
+    const topics = usedTopicLabels.map((label) => ({
+      id: label.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      label,
+    }));
 
     // Build nodes
     const topicNodes: GraphNode[] = topics.map((t) => ({

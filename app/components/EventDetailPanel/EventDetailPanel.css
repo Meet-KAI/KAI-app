@@ -99,6 +99,67 @@
   flex-shrink: 0;
 }
 
+.event-detail-panel-location-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.event-detail-panel-location-link:hover {
+  text-decoration: underline;
+}
+
+.event-detail-panel-description {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.event-detail-panel-capacity {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.event-detail-panel-capacity-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.event-detail-panel-capacity-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #737373;
+}
+
+.event-detail-panel-capacity-label svg {
+  color: #999;
+}
+
+.event-detail-panel-capacity-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.event-detail-panel-capacity-bar {
+  height: 6px;
+  background: #f0f0f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.event-detail-panel-capacity-fill {
+  height: 100%;
+  background: #374151;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
 .event-detail-panel-type {
   display: flex;
 }
@@ -150,8 +211,48 @@
   margin-top: 8px;
 }
 
-.event-detail-panel-register:hover {
+.event-detail-panel-register:hover:not(:disabled) {
   background: #1f2937;
+}
+
+.event-detail-panel-register:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.event-detail-panel-register.registered {
+  background: #dc2626;
+}
+
+.event-detail-panel-register.registered:hover {
+  background: #b91c1c;
+}
+
+.event-detail-panel-register.success {
+  background: #15803d;
+}
+
+.event-detail-panel-register.at-capacity {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.event-detail-panel-register.error {
+  background: #dc2626;
+}
+
+.event-detail-panel-register-msg {
+  font-size: 12px;
+  margin: 0;
+  text-align: center;
+}
+
+.event-detail-panel-register-msg.success {
+  color: #15803d;
+}
+
+.event-detail-panel-register-msg.error {
+  color: #dc2626;
 }
 
 .event-detail-panel-nav {
@@ -211,11 +312,27 @@
   background: #f5f5f5;
 }
 
+.event-detail-panel-list-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .event-detail-panel-list-title {
   font-size: 14px;
   font-weight: 500;
   color: #1a1a1a;
   line-height: 1.3;
+}
+
+.event-detail-panel-registered-tag {
+  align-self: flex-start;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .event-detail-panel-list-meta {

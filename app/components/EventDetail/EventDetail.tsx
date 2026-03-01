@@ -1,5 +1,5 @@
 import { Calendar, MapPin, Users } from "lucide-react";
-import { Event } from "../../data/mock-events";
+import { Event } from "../../types/events";
 import "./EventDetail.css";
 
 export default function EventDetail({

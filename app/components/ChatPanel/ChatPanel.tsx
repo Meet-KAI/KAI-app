@@ -7,7 +7,7 @@ import "./ChatPanel.css";
 export default function ChatPanel() {
   const [message, setMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!message.trim()) return;
     setMessage("");
@@ -30,7 +30,7 @@ export default function ChatPanel() {
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
-              handleSubmit(e);
+              e.currentTarget.form?.requestSubmit();
             }
           }}
           rows={2}

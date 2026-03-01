@@ -1,6 +1,6 @@
 # KAI App
 
-An event registration and knowledge hub platform for technologists. Built with Next.js 16, React 19, Tailwind CSS 4, and TypeScript.
+An event registration and knowledge hub platform for technologists. Built with Next.js 16, React 19 and TypeScript.
 
 ## Prerequisites
 

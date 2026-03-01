@@ -6,6 +6,7 @@ const API_BASE_URL = process.env.API_BASE_URL;
 const USER_ID = "00000000-0000-0000-0000-000000000001";
 
 // --- snake_case <-> camelCase helpers ---
+// API uses snake_case (max_capacity, meeting_url), frontend uses camelCase
 
 interface ApiEvent {
   id: number;
@@ -37,9 +38,7 @@ function apiEventToFrontend(api: ApiEvent): Event {
   };
 }
 
-function frontendEventToApi(
-  event: Partial<Event>
-): Record<string, unknown> {
+function frontendEventToApi(event: Partial<Event>): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   if (event.title !== undefined) result.title = event.title;
   if (event.date !== undefined) result.date = event.date;
@@ -97,7 +96,21 @@ export async function createEvent(
     throw new Error(`Failed to create event: ${res.status}`);
   }
   const data: ApiEvent = await res.json();
-  return apiEventToFrontend(data);
+  const event = apiEventToFrontend(data);
+
+  // Auto-register the creator
+  const regRes = await fetch(`${API_BASE_URL}/registrations/${event.id}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-User-Id": USER_ID,
+    },
+  });
+  if (!regRes.ok) {
+    console.error(`Auto-registration failed: ${regRes.status}`);
+  }
+
+  return event;
 }
 
 export async function updateEvent(

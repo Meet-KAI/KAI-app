@@ -12,7 +12,7 @@ import { Event } from "./types/events";
 import { fetchAllEvents, fetchEventsByUser, seedEvents } from "./actions/events";
 
 export default function Dashboard() {
-  const [activeNav, setActiveNav] = useState("chat");
+  const [activeNav, setActiveNav] = useState("events");
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
@@ -93,6 +93,15 @@ export default function Dashboard() {
     // selectedTopic remains set, so we return to topic list
   }, []);
 
+  const handleEventCreated = useCallback(() => {
+    Promise.all([fetchAllEvents(), fetchEventsByUser()])
+      .then(([allEvts, userEvts]) => {
+        setEvents(allEvts);
+        setRegisteredIds(new Set(userEvts.map((e) => e.id)));
+      })
+      .catch((err) => console.error("Failed to refetch events:", err));
+  }, []);
+
   const handleClose = useCallback(() => {
     setSelectedEvent(null);
     setSelectedTopic(null);
@@ -103,7 +112,7 @@ export default function Dashboard() {
       case "chat":
         return <ChatPanel />;
       case "events":
-        return <EventsPanel registeredIds={registeredIds} onSelectEvent={handleSelectEvent} />;
+        return <EventsPanel registeredIds={registeredIds} onSelectEvent={handleSelectEvent} onEventCreated={handleEventCreated} />;
       case "knowledge":
         return <LearningPathsPanel events={events} />;
       case "profile":

@@ -11,7 +11,7 @@ const navItems = [
 ];
 
 export default function Sidebar({
-  activeItem = "chat",
+  activeItem = "events",
   onNavigate,
 }: {
   activeItem?: string;

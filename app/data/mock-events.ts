@@ -9,6 +9,28 @@ export interface Event {
   tags: string[];
 }
 
+export interface Topic {
+  id: string;
+  label: string;
+}
+
+export const allTopics: Topic[] = [
+  { id: "cloud", label: "Cloud" },
+  { id: "kubernetes", label: "Kubernetes" },
+  { id: "serverless", label: "Serverless" },
+  { id: "frontend", label: "Frontend" },
+  { id: "react", label: "React" },
+  { id: "ai-ml", label: "AI/ML" },
+  { id: "llms", label: "LLMs" },
+  { id: "backend", label: "Backend" },
+  { id: "go", label: "Go" },
+  { id: "devops", label: "DevOps" },
+  { id: "security", label: "Security" },
+  { id: "databases", label: "Databases" },
+  { id: "performance", label: "Performance" },
+  { id: "rust", label: "Rust" },
+];
+
 export const allEvents: Event[] = [
   // Cloud & Infrastructure
   {
@@ -19,7 +41,7 @@ export const allEvents: Event[] = [
     location: "Zoom",
     type: "webinar",
     attendees: 145,
-    tags: ["Cloud", "Serverless"],
+    tags: ["Cloud", "Serverless", "Backend"],
   },
   {
     id: 2,
@@ -29,7 +51,7 @@ export const allEvents: Event[] = [
     location: "Google Meet",
     type: "webinar",
     attendees: 98,
-    tags: ["Cloud", "IaC"],
+    tags: ["Cloud", "DevOps"],
   },
   {
     id: 3,
@@ -39,7 +61,7 @@ export const allEvents: Event[] = [
     location: "Teams",
     type: "webinar",
     attendees: 312,
-    tags: ["Cloud", "Kubernetes"],
+    tags: ["Cloud", "Kubernetes", "DevOps"],
   },
   {
     id: 4,
@@ -49,7 +71,7 @@ export const allEvents: Event[] = [
     location: "Zoom",
     type: "webinar",
     attendees: 201,
-    tags: ["Cloud", "Security"],
+    tags: ["Cloud", "Security", "Kubernetes"],
   },
   {
     id: 5,
@@ -71,7 +93,7 @@ export const allEvents: Event[] = [
     location: "Google Meet",
     type: "webinar",
     attendees: 189,
-    tags: ["Frontend", "React"],
+    tags: ["Frontend", "React", "Performance"],
   },
   {
     id: 11,
@@ -81,7 +103,7 @@ export const allEvents: Event[] = [
     location: "Zoom",
     type: "webinar",
     attendees: 267,
-    tags: ["Frontend", "Next.js"],
+    tags: ["Frontend", "React"],
   },
   {
     id: 12,
@@ -91,7 +113,7 @@ export const allEvents: Event[] = [
     location: "Google Meet",
     type: "webinar",
     attendees: 132,
-    tags: ["Frontend", "CSS"],
+    tags: ["Frontend", "Performance"],
   },
   {
     id: 13,
@@ -101,7 +123,7 @@ export const allEvents: Event[] = [
     location: "Teams",
     type: "webinar",
     attendees: 178,
-    tags: ["Frontend", "Performance"],
+    tags: ["Frontend", "Performance", "Backend"],
   },
 
   // AI & ML
@@ -123,7 +145,7 @@ export const allEvents: Event[] = [
     location: "Google Meet",
     type: "webinar",
     attendees: 278,
-    tags: ["AI/ML", "RAG"],
+    tags: ["AI/ML", "LLMs", "Databases"],
   },
   {
     id: 22,
@@ -133,7 +155,7 @@ export const allEvents: Event[] = [
     location: "Pier 17, NYC",
     type: "in-person",
     attendees: 120,
-    tags: ["AI/ML", "Agents"],
+    tags: ["AI/ML", "LLMs", "Backend"],
   },
   {
     id: 23,
@@ -143,7 +165,7 @@ export const allEvents: Event[] = [
     location: "Teams",
     type: "webinar",
     attendees: 156,
-    tags: ["AI/ML", "PyTorch"],
+    tags: ["AI/ML", "Performance"],
   },
   {
     id: 24,
@@ -153,7 +175,7 @@ export const allEvents: Event[] = [
     location: "Zoom",
     type: "webinar",
     attendees: 198,
-    tags: ["AI/ML", "MLOps"],
+    tags: ["AI/ML", "DevOps", "Cloud"],
   },
 
   // Backend
@@ -165,7 +187,7 @@ export const allEvents: Event[] = [
     location: "Zoom",
     type: "webinar",
     attendees: 234,
-    tags: ["Backend", "Go"],
+    tags: ["Backend", "Go", "Performance"],
   },
   {
     id: 31,
@@ -175,7 +197,7 @@ export const allEvents: Event[] = [
     location: "Zoom",
     type: "webinar",
     attendees: 167,
-    tags: ["Backend", "Rust"],
+    tags: ["Backend", "Rust", "Performance"],
   },
   {
     id: 32,
@@ -185,7 +207,7 @@ export const allEvents: Event[] = [
     location: "Google Meet",
     type: "webinar",
     attendees: 143,
-    tags: ["Backend", "Database"],
+    tags: ["Databases", "Performance", "Backend"],
   },
   {
     id: 33,
@@ -195,7 +217,7 @@ export const allEvents: Event[] = [
     location: "Zoom",
     type: "webinar",
     attendees: 210,
-    tags: ["Backend", "Kafka"],
+    tags: ["Backend", "Cloud", "Go"],
   },
   {
     id: 34,
@@ -205,7 +227,7 @@ export const allEvents: Event[] = [
     location: "Teams",
     type: "webinar",
     attendees: 87,
-    tags: ["Backend", "APIs"],
+    tags: ["Backend", "Go", "Rust"],
   },
 
   // DevOps
@@ -217,7 +239,7 @@ export const allEvents: Event[] = [
     location: "WeWork, Manhattan",
     type: "in-person",
     attendees: 75,
-    tags: ["DevOps", "CI/CD"],
+    tags: ["DevOps", "Cloud", "Security"],
   },
   {
     id: 41,
@@ -227,7 +249,7 @@ export const allEvents: Event[] = [
     location: "Zoom",
     type: "webinar",
     attendees: 134,
-    tags: ["DevOps", "GitOps"],
+    tags: ["DevOps", "Kubernetes", "Cloud"],
   },
   {
     id: 42,
@@ -237,6 +259,6 @@ export const allEvents: Event[] = [
     location: "Google Meet",
     type: "webinar",
     attendees: 156,
-    tags: ["DevOps", "Monitoring"],
+    tags: ["DevOps", "Backend", "Performance"],
   },
 ];

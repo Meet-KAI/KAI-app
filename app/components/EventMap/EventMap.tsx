@@ -1,149 +1,365 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Event } from "../../data/mock-events";
-import EventDetail from "../EventDetail/EventDetail";
+import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  forceSimulation,
+  forceCenter,
+  forceManyBody,
+  forceCollide,
+  forceLink,
+  Simulation,
+  SimulationNodeDatum,
+  SimulationLinkDatum,
+} from "d3-force";
+import { Settings, ChevronDown, ChevronUp } from "lucide-react";
+import { Event, allTopics } from "../../data/mock-events";
 import "./EventMap.css";
 
-interface BubbleCluster {
-  tag: string;
+interface GraphNode extends SimulationNodeDatum {
+  id: string;
+  type: "event" | "topic";
+  radius: number;
+  label: string;
+  event?: Event;
+}
+
+interface GraphLink extends SimulationLinkDatum<GraphNode> {
+  source: string | GraphNode;
+  target: string | GraphNode;
+}
+
+interface EventMapProps {
   events: Event[];
-  cx: number;
-  cy: number;
+  selectedEvent: Event | null;
+  selectedTopic: string | null;
+  onSelectEvent: (event: Event | null) => void;
+  onSelectTopic: (topic: string | null) => void;
 }
 
-function seededRandom(seed: number) {
-  const x = Math.sin(seed) * 10000;
-  return x - Math.floor(x);
-}
+export default function EventMap({ events, selectedEvent, selectedTopic, onSelectEvent, onSelectTopic }: EventMapProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [nodes, setNodes] = useState<GraphNode[]>([]);
+  const [links, setLinks] = useState<GraphLink[]>([]);
 
-function generateBubblePositions(
-  events: Event[],
-  clusterCx: number,
-  clusterCy: number,
-  seed: number
-) {
-  const positions: { x: number; y: number; size: number; event: Event }[] = [];
+  // Pan/zoom state
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const isPanning = useRef(false);
+  const panStart = useRef({ x: 0, y: 0 });
+  const panOrigin = useRef({ x: 0, y: 0 });
 
-  events.forEach((event, i) => {
-    const angle = (i / events.length) * Math.PI * 2 + seededRandom(seed + i) * 0.8;
-    const radius = 40 + seededRandom(seed + i + 100) * 80;
-    const size = 20 + seededRandom(seed + i + 200) * 24;
+  // Force tuning controls
+  const [showControls, setShowControls] = useState(false);
+  const [linkDistance, setLinkDistance] = useState(200);
+  const [chargeStrength, setChargeStrength] = useState(-150);
+  const [collideRadius, setCollideRadius] = useState(20);
 
-    positions.push({
-      x: clusterCx + Math.cos(angle) * radius,
-      y: clusterCy + Math.sin(angle) * radius,
-      size,
-      event,
-    });
-  });
+  // Simulation refs
+  const simRef = useRef<Simulation<GraphNode, GraphLink> | null>(null);
+  const nodesRef = useRef<GraphNode[]>([]);
+  const linksRef = useRef<GraphLink[]>([]);
 
-  return positions;
-}
+  // Run d3-force simulation on mount / when events change
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || events.length === 0) return;
 
-export default function EventMap({ events }: { events: Event[] }) {
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [selectedPos, setSelectedPos] = useState<{ x: number; y: number } | null>(null);
+    const width = container.clientWidth;
+    const height = container.clientHeight;
 
-  const clusters = useMemo(() => {
-    const tagMap = new Map<string, Event[]>();
-    events.forEach((event) => {
-      const tag = event.tags[0] || "Other";
-      if (!tagMap.has(tag)) tagMap.set(tag, []);
-      tagMap.get(tag)!.push(event);
-    });
+    // Determine which topics are actually used
+    const usedTopicLabels = new Set(events.flatMap((e) => e.tags));
+    const topics = allTopics.filter((t) => usedTopicLabels.has(t.label));
 
-    const clusterPositions = [
-      { cx: 25, cy: 30 },
-      { cx: 72, cy: 20 },
-      { cx: 55, cy: 60 },
-      { cx: 20, cy: 65 },
-      { cx: 78, cy: 55 },
-      { cx: 40, cy: 15 },
-      { cx: 60, cy: 40 },
-      { cx: 85, cy: 35 },
-    ];
+    // Build nodes
+    const topicNodes: GraphNode[] = topics.map((t) => ({
+      id: `topic-${t.id}`,
+      type: "topic" as const,
+      radius: 14,
+      label: t.label,
+      x: width / 2 + (Math.random() - 0.5) * 200,
+      y: height / 2 + (Math.random() - 0.5) * 200,
+    }));
 
-    const result: BubbleCluster[] = [];
-    let idx = 0;
-    tagMap.forEach((tagEvents, tag) => {
-      const pos = clusterPositions[idx % clusterPositions.length];
-      result.push({ tag, events: tagEvents, cx: pos.cx, cy: pos.cy });
-      idx++;
-    });
+    const eventNodes: GraphNode[] = events.map((e) => ({
+      id: `event-${e.id}`,
+      type: "event" as const,
+      radius: 6,
+      label: e.title,
+      event: e,
+      x: width / 2 + (Math.random() - 0.5) * 200,
+      y: height / 2 + (Math.random() - 0.5) * 200,
+    }));
 
-    return result;
+    const simNodes = [...topicNodes, ...eventNodes];
+
+    // Build topic label → node id map
+    const topicLabelToId = new Map(topics.map((t) => [t.label, `topic-${t.id}`]));
+
+    // Build links: each event connects to each of its topics
+    const simLinks: GraphLink[] = [];
+    for (const e of events) {
+      for (const tag of e.tags) {
+        const topicId = topicLabelToId.get(tag);
+        if (topicId) {
+          simLinks.push({ source: `event-${e.id}`, target: topicId });
+        }
+      }
+    }
+
+    nodesRef.current = simNodes;
+    linksRef.current = simLinks;
+
+    const sim = forceSimulation(simNodes)
+      .force(
+        "link",
+        forceLink<GraphNode, GraphLink>(simLinks)
+          .id((d) => d.id)
+          .distance(linkDistance)
+      )
+      .force("center", forceCenter(width / 2, height / 2))
+      .force("charge", forceManyBody().strength(chargeStrength))
+      .force(
+        "collide",
+        forceCollide<GraphNode>((d) => d.radius + collideRadius).iterations(3)
+      )
+      .on("tick", () => {
+        setNodes([...nodesRef.current]);
+        setLinks([...linksRef.current]);
+      });
+
+    // Let it settle initially
+    sim.alpha(1).restart();
+
+    simRef.current = sim;
+
+    return () => {
+      sim.stop();
+      simRef.current = null;
+    };
+    // Only rebuild on events change — force params update via separate effect
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [events]);
 
-  const allBubbles = useMemo(() => {
-    return clusters.flatMap((cluster, ci) =>
-      generateBubblePositions(cluster.events, cluster.cx, cluster.cy, ci * 50).map(
-        (bubble) => ({
-          ...bubble,
-          tag: cluster.tag,
-        })
+  // Live-update forces when sliders change
+  useEffect(() => {
+    const sim = simRef.current;
+    if (!sim) return;
+
+    const linkForce = sim.force("link") as ReturnType<typeof forceLink<GraphNode, GraphLink>> | undefined;
+    if (linkForce) linkForce.distance(linkDistance);
+
+    const chargeForce = sim.force("charge") as ReturnType<typeof forceManyBody> | undefined;
+    if (chargeForce) chargeForce.strength(chargeStrength);
+
+    const collideForce = sim.force("collide") as ReturnType<typeof forceCollide<GraphNode>> | undefined;
+    if (collideForce) collideForce.radius((d: GraphNode) => d.radius + collideRadius);
+
+    sim.alpha(0.5).restart();
+  }, [linkDistance, chargeStrength, collideRadius]);
+
+  const handleTopicClick = useCallback(
+    (e: React.MouseEvent, node: GraphNode) => {
+      e.stopPropagation();
+      onSelectTopic(node.label);
+    },
+    [onSelectTopic]
+  );
+
+  // Pan handlers
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (
+        (e.target as HTMLElement).closest(".event-map-node") ||
+        (e.target as HTMLElement).closest(".event-map-topic-node")
       )
-    );
-  }, [clusters]);
+        return;
+      isPanning.current = true;
+      panStart.current = { x: e.clientX, y: e.clientY };
+      panOrigin.current = { ...pan };
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    },
+    [pan]
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!isPanning.current) return;
+      const dx = e.clientX - panStart.current.x;
+      const dy = e.clientY - panStart.current.y;
+      setPan({ x: panOrigin.current.x + dx, y: panOrigin.current.y + dy });
+    },
+    []
+  );
+
+  const handlePointerUp = useCallback(() => {
+    isPanning.current = false;
+  }, []);
+
+  // Zoom handler — must use non-passive listener for preventDefault to work
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      setZoom((prev) => {
+        const next = prev - e.deltaY * 0.001;
+        return Math.min(Math.max(next, 0.3), 3.0);
+      });
+    };
+
+    container.addEventListener("wheel", handleWheel, { passive: false });
+    return () => container.removeEventListener("wheel", handleWheel);
+  }, []);
+
+  const handleEventClick = useCallback(
+    (e: React.MouseEvent, event: Event) => {
+      e.stopPropagation();
+      onSelectEvent(event);
+    },
+    [onSelectEvent]
+  );
+
+  const handleBackgroundClick = useCallback(() => {
+    if (!isPanning.current) {
+      onSelectEvent(null);
+      onSelectTopic(null);
+    }
+  }, [onSelectEvent, onSelectTopic]);
 
   return (
     <div
-      className="event-map"
-      onClick={() => {
-        setSelectedEvent(null);
-        setSelectedPos(null);
-      }}
+      ref={containerRef}
+      className={`event-map ${isPanning.current ? "panning" : ""}`}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onClick={handleBackgroundClick}
     >
-      {/* Tag labels */}
-      {clusters.map((cluster) => (
-        <div
-          key={cluster.tag}
-          className="event-map-tag-label"
-          style={{ left: `${cluster.cx}%`, top: `${cluster.cy - 12}%` }}
-        >
-          {cluster.tag}
-        </div>
-      ))}
+      <div
+        className="event-map-canvas"
+        style={{
+          transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+        }}
+      >
+        {/* Edges (SVG layer underneath) */}
+        <svg className="event-map-edges">
+          {links.map((link, i) => {
+            const source = link.source as GraphNode;
+            const target = link.target as GraphNode;
+            if (!source.x || !source.y || !target.x || !target.y) return null;
+            const isHighlighted =
+              selectedTopic &&
+              (source.label === selectedTopic || target.label === selectedTopic);
+            return (
+              <line
+                key={i}
+                x1={source.x}
+                y1={source.y}
+                x2={target.x}
+                y2={target.y}
+                className={`event-map-edge ${isHighlighted ? "highlighted" : ""}`}
+              />
+            );
+          })}
+        </svg>
 
-      {/* Bubbles */}
-      {allBubbles.map((bubble, i) => (
+        {/* Nodes (div layer on top) */}
+        {nodes.map((node) => {
+          if (node.type === "topic") {
+            return (
+              <button
+                key={node.id}
+                className={`event-map-topic-node ${
+                  selectedTopic === node.label ? "selected" : ""
+                }`}
+                style={{
+                  left: node.x,
+                  top: node.y,
+                  width: node.radius * 2,
+                  height: node.radius * 2,
+                }}
+                onClick={(e) => handleTopicClick(e, node)}
+              >
+                <span className="event-map-topic-label">{node.label}</span>
+              </button>
+            );
+          }
+
+          return (
+            <button
+              key={node.id}
+              className={`event-map-node ${
+                selectedEvent?.id === node.event?.id ? "selected" : ""
+              }`}
+              style={{
+                left: node.x,
+                top: node.y,
+                width: node.radius * 2,
+                height: node.radius * 2,
+              }}
+              onClick={(e) => node.event && handleEventClick(e, node.event)}
+            />
+          );
+        })}
+      </div>
+
+      {/* Force tuning controls */}
+      <div
+        className="event-map-controls"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
-          key={i}
-          className={`event-map-bubble ${
-            selectedEvent?.id === bubble.event.id ? "selected" : ""
-          }`}
-          style={{
-            left: `${bubble.x}%`,
-            top: `${bubble.y}%`,
-            width: bubble.size,
-            height: bubble.size,
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            setSelectedEvent(bubble.event);
-            setSelectedPos({ x: bubble.x, y: bubble.y });
-          }}
-        />
-      ))}
-
-      {/* Selected event detail card */}
-      {selectedEvent && selectedPos && (
-        <div
-          style={{
-            left: `${Math.min(selectedPos.x, 70)}%`,
-            top: `${Math.min(selectedPos.y + 5, 55)}%`,
-          }}
-          className="event-map-detail-anchor"
+          className="event-map-controls-toggle"
+          onClick={() => setShowControls((v) => !v)}
         >
-          <EventDetail
-            event={selectedEvent}
-            onClose={() => {
-              setSelectedEvent(null);
-              setSelectedPos(null);
-            }}
-          />
-        </div>
-      )}
+          <Settings size={14} />
+          <span>Graph</span>
+          {showControls ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+        </button>
+
+        {showControls && (
+          <div className="event-map-controls-body">
+            <label className="event-map-control">
+              <span className="event-map-control-label">
+                Link Distance <strong>{linkDistance}</strong>
+              </span>
+              <input
+                type="range"
+                min={50}
+                max={400}
+                value={linkDistance}
+                onChange={(e) => setLinkDistance(Number(e.target.value))}
+              />
+            </label>
+            <label className="event-map-control">
+              <span className="event-map-control-label">
+                Repulsion <strong>{Math.abs(chargeStrength)}</strong>
+              </span>
+              <input
+                type="range"
+                min={10}
+                max={500}
+                value={Math.abs(chargeStrength)}
+                onChange={(e) => setChargeStrength(-Number(e.target.value))}
+              />
+            </label>
+            <label className="event-map-control">
+              <span className="event-map-control-label">
+                Collision Padding <strong>{collideRadius}</strong>
+              </span>
+              <input
+                type="range"
+                min={2}
+                max={60}
+                value={collideRadius}
+                onChange={(e) => setCollideRadius(Number(e.target.value))}
+              />
+            </label>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -11,8 +11,8 @@ import {
   SimulationNodeDatum,
   SimulationLinkDatum,
 } from "d3-force";
+import { Settings, ChevronDown, ChevronUp } from "lucide-react";
 import { Event, allTopics } from "../../data/mock-events";
-import EventDetail from "../EventDetail/EventDetail";
 import "./EventMap.css";
 
 interface GraphNode extends SimulationNodeDatum {
@@ -28,15 +28,18 @@ interface GraphLink extends SimulationLinkDatum<GraphNode> {
   target: string | GraphNode;
 }
 
-export default function EventMap({ events }: { events: Event[] }) {
+interface EventMapProps {
+  events: Event[];
+  selectedEvent: Event | null;
+  selectedTopic: string | null;
+  onSelectEvent: (event: Event | null) => void;
+  onSelectTopic: (topic: string | null) => void;
+}
+
+export default function EventMap({ events, selectedEvent, selectedTopic, onSelectEvent, onSelectTopic }: EventMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useState<GraphNode[]>([]);
   const [links, setLinks] = useState<GraphLink[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [selectedScreenPos, setSelectedScreenPos] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
 
   // Pan/zoom state
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -45,12 +48,16 @@ export default function EventMap({ events }: { events: Event[] }) {
   const panStart = useRef({ x: 0, y: 0 });
   const panOrigin = useRef({ x: 0, y: 0 });
 
-  // Simulation + drag refs
+  // Force tuning controls
+  const [showControls, setShowControls] = useState(false);
+  const [linkDistance, setLinkDistance] = useState(200);
+  const [chargeStrength, setChargeStrength] = useState(-150);
+  const [collideRadius, setCollideRadius] = useState(20);
+
+  // Simulation refs
   const simRef = useRef<Simulation<GraphNode, GraphLink> | null>(null);
   const nodesRef = useRef<GraphNode[]>([]);
   const linksRef = useRef<GraphLink[]>([]);
-  const dragNode = useRef<GraphNode | null>(null);
-  const dragMoved = useRef(false);
 
   // Run d3-force simulation on mount / when events change
   useEffect(() => {
@@ -108,13 +115,13 @@ export default function EventMap({ events }: { events: Event[] }) {
         "link",
         forceLink<GraphNode, GraphLink>(simLinks)
           .id((d) => d.id)
-          .distance(120)
+          .distance(linkDistance)
       )
       .force("center", forceCenter(width / 2, height / 2))
-      .force("charge", forceManyBody().strength(-60))
+      .force("charge", forceManyBody().strength(chargeStrength))
       .force(
         "collide",
-        forceCollide<GraphNode>((d) => d.radius + 6).iterations(3)
+        forceCollide<GraphNode>((d) => d.radius + collideRadius).iterations(3)
       )
       .on("tick", () => {
         setNodes([...nodesRef.current]);
@@ -130,54 +137,34 @@ export default function EventMap({ events }: { events: Event[] }) {
       sim.stop();
       simRef.current = null;
     };
+    // Only rebuild on events change — force params update via separate effect
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [events]);
 
-  // --- Drag handlers on nodes ---
-  const handleNodePointerDown = useCallback(
-    (e: React.PointerEvent, node: GraphNode) => {
+  // Live-update forces when sliders change
+  useEffect(() => {
+    const sim = simRef.current;
+    if (!sim) return;
+
+    const linkForce = sim.force("link") as ReturnType<typeof forceLink<GraphNode, GraphLink>> | undefined;
+    if (linkForce) linkForce.distance(linkDistance);
+
+    const chargeForce = sim.force("charge") as ReturnType<typeof forceManyBody> | undefined;
+    if (chargeForce) chargeForce.strength(chargeStrength);
+
+    const collideForce = sim.force("collide") as ReturnType<typeof forceCollide<GraphNode>> | undefined;
+    if (collideForce) collideForce.radius((d: GraphNode) => d.radius + collideRadius);
+
+    sim.alpha(0.5).restart();
+  }, [linkDistance, chargeStrength, collideRadius]);
+
+  const handleTopicClick = useCallback(
+    (e: React.MouseEvent, node: GraphNode) => {
       e.stopPropagation();
-      (e.target as HTMLElement).setPointerCapture(e.pointerId);
-
-      dragNode.current = node;
-      dragMoved.current = false;
-      node.fx = node.x;
-      node.fy = node.y;
-
-      // Reheat simulation
-      simRef.current?.alphaTarget(0.3).restart();
+      onSelectTopic(node.label);
     },
-    []
+    [onSelectTopic]
   );
-
-  const handleNodePointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      const node = dragNode.current;
-      if (!node) return;
-
-      dragMoved.current = true;
-
-      const container = containerRef.current;
-      if (!container) return;
-
-      const rect = container.getBoundingClientRect();
-      // Convert screen coords to canvas coords (account for pan + zoom)
-      node.fx = (e.clientX - rect.left - pan.x) / zoom;
-      node.fy = (e.clientY - rect.top - pan.y) / zoom;
-    },
-    [pan, zoom]
-  );
-
-  const handleNodePointerUp = useCallback(() => {
-    const node = dragNode.current;
-    if (!node) return;
-
-    node.fx = null;
-    node.fy = null;
-    dragNode.current = null;
-
-    // Let simulation cool down
-    simRef.current?.alphaTarget(0);
-  }, []);
 
   // Pan handlers
   const handlePointerDown = useCallback(
@@ -197,7 +184,6 @@ export default function EventMap({ events }: { events: Event[] }) {
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
-      if (dragNode.current) return; // drag handled separately
       if (!isPanning.current) return;
       const dx = e.clientX - panStart.current.x;
       const dy = e.clientY - panStart.current.y;
@@ -230,23 +216,17 @@ export default function EventMap({ events }: { events: Event[] }) {
   const handleEventClick = useCallback(
     (e: React.MouseEvent, event: Event) => {
       e.stopPropagation();
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      setSelectedEvent(event);
-      setSelectedScreenPos({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      });
+      onSelectEvent(event);
     },
-    []
+    [onSelectEvent]
   );
 
   const handleBackgroundClick = useCallback(() => {
     if (!isPanning.current) {
-      setSelectedEvent(null);
-      setSelectedScreenPos(null);
+      onSelectEvent(null);
+      onSelectTopic(null);
     }
-  }, []);
+  }, [onSelectEvent, onSelectTopic]);
 
   return (
     <div
@@ -269,6 +249,9 @@ export default function EventMap({ events }: { events: Event[] }) {
             const source = link.source as GraphNode;
             const target = link.target as GraphNode;
             if (!source.x || !source.y || !target.x || !target.y) return null;
+            const isHighlighted =
+              selectedTopic &&
+              (source.label === selectedTopic || target.label === selectedTopic);
             return (
               <line
                 key={i}
@@ -276,7 +259,7 @@ export default function EventMap({ events }: { events: Event[] }) {
                 y1={source.y}
                 x2={target.x}
                 y2={target.y}
-                className="event-map-edge"
+                className={`event-map-edge ${isHighlighted ? "highlighted" : ""}`}
               />
             );
           })}
@@ -286,10 +269,10 @@ export default function EventMap({ events }: { events: Event[] }) {
         {nodes.map((node) => {
           if (node.type === "topic") {
             return (
-              <div
+              <button
                 key={node.id}
                 className={`event-map-topic-node ${
-                  dragNode.current?.id === node.id ? "dragging" : ""
+                  selectedTopic === node.label ? "selected" : ""
                 }`}
                 style={{
                   left: node.x,
@@ -297,12 +280,10 @@ export default function EventMap({ events }: { events: Event[] }) {
                   width: node.radius * 2,
                   height: node.radius * 2,
                 }}
-                onPointerDown={(e) => handleNodePointerDown(e, node)}
-                onPointerMove={handleNodePointerMove}
-                onPointerUp={handleNodePointerUp}
+                onClick={(e) => handleTopicClick(e, node)}
               >
                 <span className="event-map-topic-label">{node.label}</span>
-              </div>
+              </button>
             );
           }
 
@@ -324,34 +305,61 @@ export default function EventMap({ events }: { events: Event[] }) {
         })}
       </div>
 
-      {/* Detail card in screen-space (not affected by pan/zoom) */}
-      {selectedEvent && selectedScreenPos && (
-        <div
-          className="event-map-detail-anchor"
-          style={{
-            left: Math.min(
-              selectedScreenPos.x,
-              containerRef.current
-                ? containerRef.current.clientWidth - 320
-                : selectedScreenPos.x
-            ),
-            top: Math.min(
-              selectedScreenPos.y + 20,
-              containerRef.current
-                ? containerRef.current.clientHeight - 300
-                : selectedScreenPos.y
-            ),
-          }}
+      {/* Force tuning controls */}
+      <div
+        className="event-map-controls"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          className="event-map-controls-toggle"
+          onClick={() => setShowControls((v) => !v)}
         >
-          <EventDetail
-            event={selectedEvent}
-            onClose={() => {
-              setSelectedEvent(null);
-              setSelectedScreenPos(null);
-            }}
-          />
-        </div>
-      )}
+          <Settings size={14} />
+          <span>Graph</span>
+          {showControls ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+        </button>
+
+        {showControls && (
+          <div className="event-map-controls-body">
+            <label className="event-map-control">
+              <span className="event-map-control-label">
+                Link Distance <strong>{linkDistance}</strong>
+              </span>
+              <input
+                type="range"
+                min={50}
+                max={400}
+                value={linkDistance}
+                onChange={(e) => setLinkDistance(Number(e.target.value))}
+              />
+            </label>
+            <label className="event-map-control">
+              <span className="event-map-control-label">
+                Repulsion <strong>{Math.abs(chargeStrength)}</strong>
+              </span>
+              <input
+                type="range"
+                min={10}
+                max={500}
+                value={Math.abs(chargeStrength)}
+                onChange={(e) => setChargeStrength(-Number(e.target.value))}
+              />
+            </label>
+            <label className="event-map-control">
+              <span className="event-map-control-label">
+                Collision Padding <strong>{collideRadius}</strong>
+              </span>
+              <input
+                type="range"
+                min={2}
+                max={60}
+                value={collideRadius}
+                onChange={(e) => setCollideRadius(Number(e.target.value))}
+              />
+            </label>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -2,8 +2,8 @@
   width: 320px;
   min-width: 320px;
   height: 100vh;
-  background: #ffffff;
-  border-left: 1px solid #e5e5e5;
+  background: #f0ebe3;
+  border-left: 1px solid #d4cdc4;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -14,14 +14,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 20px 20px 16px;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid #d4cdc4;
   gap: 8px;
 }
 
 .event-detail-panel-heading {
   font-size: 14px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #1a1715;
   margin: 0;
 }
 
@@ -32,7 +32,7 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: #555;
+  color: #5c5549;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -40,7 +40,7 @@
 }
 
 .event-detail-panel-back:hover {
-  color: #1a1a1a;
+  color: #1a1715;
 }
 
 .event-detail-panel-close {
@@ -52,15 +52,15 @@
   border: none;
   background: transparent;
   border-radius: 6px;
-  color: #737373;
+  color: #8a827a;
   cursor: pointer;
   flex-shrink: 0;
   transition: background 0.15s ease;
 }
 
 .event-detail-panel-close:hover {
-  background: #f5f5f5;
-  color: #1a1a1a;
+  background: #e8e2d8;
+  color: #1a1715;
 }
 
 .event-detail-panel-body {
@@ -75,7 +75,7 @@
 .event-detail-panel-title {
   font-size: 18px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #1a1715;
   line-height: 1.3;
   margin: 0;
 }
@@ -91,27 +91,27 @@
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #555;
+  color: #5c5549;
 }
 
 .event-detail-panel-meta-row svg {
-  color: #999;
+  color: #a8a096;
   flex-shrink: 0;
 }
 
 .event-detail-panel-location-link {
-  color: #2563eb;
-  text-decoration: none;
+  color: #1a1715;
+  text-decoration: underline;
   font-size: 13px;
 }
 
 .event-detail-panel-location-link:hover {
-  text-decoration: underline;
+  color: #5c5549;
 }
 
 .event-detail-panel-description {
   font-size: 13px;
-  color: #555;
+  color: #5c5549;
   line-height: 1.6;
   margin: 0;
 }
@@ -133,29 +133,29 @@
   align-items: center;
   gap: 5px;
   font-size: 12px;
-  color: #737373;
+  color: #8a827a;
 }
 
 .event-detail-panel-capacity-label svg {
-  color: #999;
+  color: #a8a096;
 }
 
 .event-detail-panel-capacity-count {
   font-size: 12px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #1a1715;
 }
 
 .event-detail-panel-capacity-bar {
   height: 6px;
-  background: #f0f0f0;
+  background: #d4cdc4;
   border-radius: 3px;
   overflow: hidden;
 }
 
 .event-detail-panel-capacity-fill {
   height: 100%;
-  background: #374151;
+  background: #1a1715;
   border-radius: 3px;
   transition: width 0.3s ease;
 }
@@ -173,8 +173,8 @@
 }
 
 .event-detail-panel-badge.webinar {
-  background: #e0f2fe;
-  color: #0369a1;
+  background: #dbeafe;
+  color: #1e40af;
 }
 
 .event-detail-panel-badge.in-person {
@@ -191,9 +191,9 @@
 .event-detail-panel-tag {
   padding: 4px 12px;
   border-radius: 12px;
-  background: #f0f0f0;
+  background: #e8e2d8;
   font-size: 12px;
-  color: #444;
+  color: #5c5549;
   font-weight: 500;
 }
 
@@ -202,8 +202,8 @@
   padding: 12px;
   border: none;
   border-radius: 10px;
-  background: #374151;
-  color: #fff;
+  background: #1a1715;
+  color: #f0ebe3;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -212,7 +212,7 @@
 }
 
 .event-detail-panel-register:hover:not(:disabled) {
-  background: #1f2937;
+  background: #2e2a26;
 }
 
 .event-detail-panel-register:disabled {
@@ -222,6 +222,7 @@
 
 .event-detail-panel-register.registered {
   background: #dc2626;
+  color: #fff;
 }
 
 .event-detail-panel-register.registered:hover {
@@ -230,15 +231,17 @@
 
 .event-detail-panel-register.success {
   background: #15803d;
+  color: #fff;
 }
 
 .event-detail-panel-register.at-capacity {
-  background: #9ca3af;
+  background: #b0a89e;
   cursor: not-allowed;
 }
 
 .event-detail-panel-register.error {
   background: #dc2626;
+  color: #fff;
 }
 
 .event-detail-panel-register-msg {
@@ -259,7 +262,7 @@
   display: flex;
   justify-content: space-between;
   padding: 16px 20px;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid #d4cdc4;
 }
 
 .event-detail-panel-nav-btn {
@@ -267,10 +270,10 @@
   align-items: center;
   gap: 4px;
   padding: 8px 14px;
-  border: 1px solid #e5e5e5;
+  border: 1px solid #d4cdc4;
   border-radius: 8px;
-  background: #ffffff;
-  color: #374151;
+  background: #f0ebe3;
+  color: #5c5549;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -278,14 +281,14 @@
 }
 
 .event-detail-panel-nav-btn:hover {
-  background: #f5f5f5;
-  border-color: #d4d4d4;
+  background: #e8e2d8;
+  border-color: #b0a89e;
 }
 
 /* Topic list view */
 .event-detail-panel-count {
   font-size: 13px;
-  color: #737373;
+  color: #8a827a;
   margin: 0;
 }
 
@@ -309,7 +312,7 @@
 }
 
 .event-detail-panel-list-item:hover {
-  background: #f5f5f5;
+  background: #e8e2d8;
 }
 
 .event-detail-panel-list-title-row {
@@ -321,7 +324,7 @@
 .event-detail-panel-list-title {
   font-size: 14px;
   font-weight: 500;
-  color: #1a1a1a;
+  color: #1a1715;
   line-height: 1.3;
 }
 
@@ -340,9 +343,9 @@
   align-items: center;
   gap: 5px;
   font-size: 12px;
-  color: #737373;
+  color: #8a827a;
 }
 
 .event-detail-panel-list-meta svg {
-  color: #999;
+  color: #a8a096;
 }

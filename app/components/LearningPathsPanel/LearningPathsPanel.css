@@ -4,16 +4,16 @@
   width: 320px;
   min-width: 320px;
   height: 100%;
-  background: #fff;
-  border-right: 1px solid #e5e5e5;
+  background: #f0ebe3;
+  border-right: 1px solid #d4cdc4;
 }
 
 .paths-header {
   padding: 14px 20px;
   font-size: 15px;
   font-weight: 500;
-  color: #1a1a1a;
-  border-bottom: 1px solid #f0f0f0;
+  color: #1a1715;
+  border-bottom: 1px solid #d4cdc4;
 }
 
 .paths-list {
@@ -27,7 +27,7 @@
 
 .path-card {
   padding: 14px;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #d4cdc4;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -35,7 +35,7 @@
 }
 
 .path-card:hover {
-  border-color: #d4d4d4;
+  border-color: #b0a89e;
 }
 
 .path-title {
@@ -44,12 +44,12 @@
   gap: 8px;
   font-size: 14px;
   font-weight: 500;
-  color: #1a1a1a;
+  color: #1a1715;
 }
 
 .path-description {
   font-size: 12px;
-  color: #737373;
+  color: #8a827a;
 }
 
 .path-events {
@@ -64,7 +64,7 @@
   align-items: center;
   gap: 10px;
   font-size: 13px;
-  color: #525252;
+  color: #5c5549;
 }
 
 .path-event-number {
@@ -74,10 +74,10 @@
   width: 20px;
   height: 20px;
   border-radius: 9999px;
-  background: #f5f5f5;
+  background: #e8e2d8;
   font-size: 11px;
   font-weight: 500;
-  color: #737373;
+  color: #8a827a;
   flex-shrink: 0;
 }
 

@@ -4,8 +4,8 @@
   width: 320px;
   min-width: 320px;
   height: 100%;
-  background: #fff;
-  border-right: 1px solid #e5e5e5;
+  background: #f0ebe3;
+  border-right: 1px solid #d4cdc4;
 }
 
 .events-header {
@@ -15,8 +15,8 @@
   padding: 14px 20px;
   font-size: 15px;
   font-weight: 500;
-  color: #1a1a1a;
-  border-bottom: 1px solid #f0f0f0;
+  color: #1a1715;
+  border-bottom: 1px solid #d4cdc4;
 }
 
 .create-event-btn {
@@ -26,16 +26,16 @@
   padding: 4px 10px;
   font-size: 12px;
   font-weight: 500;
-  color: #525252;
-  background: #f5f5f5;
-  border: 1px solid #e5e5e5;
+  color: #5c5549;
+  background: #e8e2d8;
+  border: 1px solid #d4cdc4;
   border-radius: 6px;
   cursor: pointer;
 }
 
 .create-event-btn:hover {
-  background: #ebebeb;
-  color: #1a1a1a;
+  background: #ddd6cb;
+  color: #1a1715;
 }
 
 .events-list {
@@ -54,9 +54,9 @@
   flex-direction: column;
   gap: 10px;
   padding: 14px;
-  border: 1px solid #e5e5e5;
+  border: 1px solid #d4cdc4;
   border-radius: 10px;
-  background: #fafafa;
+  background: #f5f1eb;
 }
 
 .create-event-form label {
@@ -65,7 +65,7 @@
   gap: 3px;
   font-size: 12px;
   font-weight: 500;
-  color: #525252;
+  color: #5c5549;
 }
 
 .create-event-form input,
@@ -73,10 +73,10 @@
 .create-event-form textarea {
   padding: 6px 10px;
   font-size: 13px;
-  border: 1px solid #e5e5e5;
+  border: 1px solid #d4cdc4;
   border-radius: 6px;
-  background: #fff;
-  color: #1a1a1a;
+  background: #f0ebe3;
+  color: #1a1715;
   outline: none;
   font-family: inherit;
 }
@@ -84,7 +84,7 @@
 .create-event-form input:focus,
 .create-event-form select:focus,
 .create-event-form textarea:focus {
-  border-color: #a3a3a3;
+  border-color: #8a827a;
 }
 
 .create-event-form textarea {
@@ -111,31 +111,31 @@
   padding: 6px 14px;
   font-size: 12px;
   font-weight: 500;
-  color: #737373;
-  background: #fff;
-  border: 1px solid #e5e5e5;
+  color: #8a827a;
+  background: #f0ebe3;
+  border: 1px solid #d4cdc4;
   border-radius: 6px;
   cursor: pointer;
 }
 
 .form-cancel-btn:hover {
-  background: #f5f5f5;
-  color: #525252;
+  background: #e8e2d8;
+  color: #5c5549;
 }
 
 .form-submit-btn {
   padding: 6px 14px;
   font-size: 12px;
   font-weight: 500;
-  color: #fff;
-  background: #1a1a1a;
-  border: 1px solid #1a1a1a;
+  color: #f0ebe3;
+  background: #1a1715;
+  border: 1px solid #1a1715;
   border-radius: 6px;
   cursor: pointer;
 }
 
 .form-submit-btn:hover {
-  background: #333;
+  background: #2e2a26;
 }
 
 .form-submit-btn:disabled {
@@ -147,7 +147,7 @@
 
 .event-card {
   padding: 12px 14px;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #d4cdc4;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -155,7 +155,7 @@
 }
 
 .event-card:hover {
-  border-color: #d4d4d4;
+  border-color: #b0a89e;
 }
 
 .event-date {
@@ -163,7 +163,7 @@
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #737373;
+  color: #8a827a;
 }
 
 .event-time {
@@ -173,7 +173,7 @@
 .event-title {
   font-size: 14px;
   font-weight: 500;
-  color: #1a1a1a;
+  color: #1a1715;
 }
 
 .event-location {
@@ -181,7 +181,7 @@
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: #a3a3a3;
+  color: #a8a096;
 }
 
 .event-tags {
@@ -195,6 +195,6 @@
   font-size: 11px;
   padding: 2px 8px;
   border-radius: 9999px;
-  background: #f5f5f5;
-  color: #525252;
+  background: #e8e2d8;
+  color: #5c5549;
 }

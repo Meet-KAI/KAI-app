@@ -2,6 +2,15 @@
 
 An event registration and knowledge hub platform for technologists. Built with Next.js 16, React 19 and TypeScript.
 
+## Tech Stack
+
+| Technology | Version |
+|------------|---------|
+| Next.js | 16.1.6 |
+| React | 19.2.3 |
+| TypeScript | 5.x |
+| Node.js | 20+ |
+
 ## Prerequisites
 
 - [Bun](https://bun.sh/) (package manager)

@@ -4,8 +4,8 @@ import { MessageSquare, CalendarDays, Library, Users } from "lucide-react";
 import "./Sidebar.css";
 
 const navItems = [
-  { icon: MessageSquare, label: "Chat", id: "chat" },
   { icon: CalendarDays, label: "Events", id: "events" },
+  { icon: MessageSquare, label: "Chat", id: "chat" },
   { icon: Library, label: "Knowledge", id: "knowledge" },
   { icon: Users, label: "Profile", id: "profile" },
 ];

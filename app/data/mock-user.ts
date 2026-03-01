@@ -1,5 +1,3 @@
-import { allEvents } from "./mock-events";
-
 export interface UserProfile {
   name: string;
   email: string;
@@ -9,9 +7,9 @@ export interface UserProfile {
 }
 
 export const currentUser: UserProfile = {
-  name: "Alex Chen",
-  email: "alex.chen@example.com",
-  title: "Senior Software Engineer",
+  name: "Jason Hutchinson",
+  email: "Jason.Hutchinson@example.com",
+  title: "Solution Architect",
   skills: [
     "React",
     "TypeScript",
@@ -26,10 +24,6 @@ export const currentUser: UserProfile = {
   ],
   registeredEventIds: [1, 3, 11, 20, 22, 31],
 };
-
-export const registeredEvents = allEvents.filter((e) =>
-  currentUser.registeredEventIds.includes(e.id)
-);
 
 export interface LearningPath {
   id: number;

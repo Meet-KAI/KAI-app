@@ -2,10 +2,14 @@
 
 import { BookOpen } from "lucide-react";
 import { learningPaths } from "../../data/mock-user";
-import { allEvents } from "../../data/mock-events";
+import { Event } from "../../types/events";
 import "./LearningPathsPanel.css";
 
-export default function LearningPathsPanel() {
+interface LearningPathsPanelProps {
+  events: Event[];
+}
+
+export default function LearningPathsPanel({ events }: LearningPathsPanelProps) {
   return (
     <div className="paths-panel">
       <div className="paths-header">Learning Paths</div>
@@ -20,7 +24,7 @@ export default function LearningPathsPanel() {
             <div className="path-description">{path.description}</div>
             <div className="path-events">
               {path.eventIds.map((eventId, index) => {
-                const event = allEvents.find((e) => e.id === eventId);
+                const event = events.find((e) => e.id === eventId);
                 if (!event) return null;
                 return (
                   <div key={event.id} className="path-event">

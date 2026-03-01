@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import {
   Calendar,
   MapPin,
@@ -7,30 +10,74 @@ import {
   X,
   ArrowLeft,
 } from "lucide-react";
-import { Event } from "../../data/mock-events";
+import { Event } from "../../types/events";
+import { registerForEvent, unregisterFromEvent } from "../../actions/events";
 import "./EventDetailPanel.css";
 
 interface EventDetailPanelProps {
   event: Event | null;
   topic: string | null;
   topicEvents: Event[];
+  registeredIds: Set<number>;
   onClose: () => void;
   onNext: () => void;
   onPrev: () => void;
   onTopicEventClick: (event: Event) => void;
   onBackToTopic?: () => void;
+  onRegistrationChange: (eventId: number, registered: boolean) => void;
 }
 
 export default function EventDetailPanel({
   event,
   topic,
   topicEvents,
+  registeredIds,
   onClose,
   onNext,
   onPrev,
   onTopicEventClick,
   onBackToTopic,
+  onRegistrationChange,
 }: EventDetailPanelProps) {
+  const [registerState, setRegisterState] = useState<
+    "idle" | "loading" | "registered" | "success" | "error"
+  >("idle");
+  const [registerMessage, setRegisterMessage] = useState("");
+
+  const isRegistered = event ? registeredIds.has(event.id) : false;
+
+  useEffect(() => {
+    setRegisterState(isRegistered ? "registered" : "idle");
+    setRegisterMessage("");
+  }, [event?.id, isRegistered]);
+
+  async function handleRegister() {
+    if (!event) return;
+    setRegisterState("loading");
+    setRegisterMessage("");
+
+    if (isRegistered) {
+      const result = await unregisterFromEvent(event.id);
+      if (result.success) {
+        onRegistrationChange(event.id, false);
+        setRegisterState("idle");
+        setRegisterMessage(result.message);
+      } else {
+        setRegisterState("registered");
+        setRegisterMessage(result.message);
+      }
+    } else {
+      const result = await registerForEvent(event.id);
+      if (result.success) {
+        onRegistrationChange(event.id, true);
+        setRegisterState("registered");
+        setRegisterMessage(result.message);
+      } else {
+        setRegisterState("error");
+        setRegisterMessage(result.message);
+      }
+    }
+  }
   // Topic list view: topic is selected but no event drilled into
   if (topic && !event) {
     return (
@@ -54,9 +101,14 @@ export default function EventDetailPanel({
                 className="event-detail-panel-list-item"
                 onClick={() => onTopicEventClick(ev)}
               >
-                <span className="event-detail-panel-list-title">
-                  {ev.title}
-                </span>
+                <div className="event-detail-panel-list-title-row">
+                  <span className="event-detail-panel-list-title">
+                    {ev.title}
+                  </span>
+                  {registeredIds.has(ev.id) && (
+                    <span className="event-detail-panel-registered-tag">Registered</span>
+                  )}
+                </div>
                 <div className="event-detail-panel-list-meta">
                   <Calendar size={12} />
                   <span>{ev.date}</span>
@@ -105,11 +157,41 @@ export default function EventDetailPanel({
           </div>
           <div className="event-detail-panel-meta-row">
             <MapPin size={15} />
-            <span>{event.location}</span>
+            {event.meetingUrl ? (
+              <a
+                href={event.meetingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="event-detail-panel-location-link"
+              >
+                {event.location}
+              </a>
+            ) : (
+              <span>{event.location}</span>
+            )}
           </div>
-          <div className="event-detail-panel-meta-row">
-            <Users size={15} />
-            <span>{event.attendees} attending</span>
+          {isRegistered && (
+            <span className="event-detail-panel-registered-tag">Registered</span>
+          )}
+        </div>
+
+        <p className="event-detail-panel-description">{event.description}</p>
+
+        <div className="event-detail-panel-capacity">
+          <div className="event-detail-panel-capacity-header">
+            <div className="event-detail-panel-capacity-label">
+              <Users size={13} />
+              <span>Capacity</span>
+            </div>
+            <span className="event-detail-panel-capacity-count">
+              {event.attendees}/{event.maxCapacity}
+            </span>
+          </div>
+          <div className="event-detail-panel-capacity-bar">
+            <div
+              className="event-detail-panel-capacity-fill"
+              style={{ width: `${Math.min((event.attendees / event.maxCapacity) * 100, 100)}%` }}
+            />
           </div>
         </div>
 
@@ -127,7 +209,26 @@ export default function EventDetailPanel({
           ))}
         </div>
 
-        <button className="event-detail-panel-register">Register</button>
+        <button
+          className={`event-detail-panel-register ${!isRegistered && event.attendees >= event.maxCapacity ? "at-capacity" : registerState}`}
+          onClick={handleRegister}
+          disabled={registerState === "loading" || (!isRegistered && event.attendees >= event.maxCapacity)}
+        >
+          {!isRegistered && event.attendees >= event.maxCapacity
+            ? "Event at Capacity"
+            : registerState === "loading"
+            ? "Loading..."
+            : registerState === "registered"
+            ? "Unregister"
+            : registerState === "error"
+            ? "Try Again"
+            : "Register"}
+        </button>
+        {registerMessage && (
+          <p className={`event-detail-panel-register-msg ${registerState}`}>
+            {registerMessage}
+          </p>
+        )}
       </div>
 
       <div className="event-detail-panel-nav">

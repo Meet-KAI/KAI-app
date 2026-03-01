@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KAI App
+
+An event registration and knowledge hub platform for technologists. Built with Next.js 16, React 19, Tailwind CSS 4, and TypeScript.
+
+## Prerequisites
+
+- [Bun](https://bun.sh/) (package manager)
+- [KAI Event Service API](https://github.com/Meet-KAI/KAI-event-service-api) running locally
 
 ## Getting Started
 
-First, run the development server:
+### 1. Start the API first
+
+This app requires the **KAI Event Service API** to be running. See the [API repository](https://github.com/Meet-KAI/KAI-event-service-api) for setup instructions, or quickly:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+cd KAI-event-service-api
+uv sync
+uv run uvicorn main:app --reload
+```
+
+The API runs on `http://localhost:8000` by default.
+
+### 2. Install dependencies
+
+```bash
+bun install
+```
+
+### 3. Configure environment
+
+Create a `.env.local` file in the project root:
+
+```
+API_BASE_URL=http://127.0.0.1:8000/api/v1
+```
+
+### 4. Run the app
+
+```bash
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Important: In-Memory Data
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+All data in the API is stored **in memory** — there is no database. When the frontend starts, it automatically seeds the API with sample event data.
 
-## Learn More
+This means:
 
-To learn more about Next.js, take a look at the following resources:
+- **Restarting the API** will lose all created events, registrations, and any other changes
+- **Restarting the frontend** will re-seed the sample data into the API
+- Any events you create or registrations you make persist only as long as the API process is running
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command | Description |
+|---------|-------------|
+| `bun dev` | Start the development server |
+| `bun run build` | Build for production |
+| `bun start` | Start the production server |
+| `bun run lint` | Run ESLint |

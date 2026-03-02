@@ -1,26 +1,13 @@
 "use server";
 
 import { Event } from "../types/events";
+import { ApiEvent } from "../types/api";
 
 const API_BASE_URL = process.env.API_BASE_URL;
 const USER_ID = "00000000-0000-0000-0000-000000000001";
 
 // --- snake_case <-> camelCase helpers ---
 // API uses snake_case (max_capacity, meeting_url), frontend uses camelCase
-
-interface ApiEvent {
-  id: number;
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  meeting_url?: string;
-  type: "webinar" | "in-person";
-  attendees: number;
-  max_capacity: number;
-  description: string;
-  tags: string[];
-}
 
 function apiEventToFrontend(api: ApiEvent): Event {
   return {

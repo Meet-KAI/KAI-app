@@ -13,11 +13,7 @@ export const metadata: Metadata = {
   description: "Event registration and knowledge hub for technologists",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({children,}: Readonly<{children: React.ReactNode;}>) {
   return (
     <html lang="en">
       <body

@@ -16,6 +16,34 @@ An event registration and knowledge hub platform for technologists. Built with N
 - [Bun](https://bun.sh/) (package manager)
 - [KAI Event Service API](https://github.com/Meet-KAI/KAI-event-service-api) running locally
 
+### Installing Bun
+
+If you don't have Bun installed, run one of the following:
+
+**macOS / Linux:**
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+**Windows:**
+
+```powershell
+powershell -c "irm bun.sh/install.ps1 | iex"
+```
+
+**Via npm (any platform):**
+
+```bash
+npm install -g bun
+```
+
+After installing, verify it's working:
+
+```bash
+bun --version
+```
+
 ## Getting Started
 
 ### 1. Start the API first

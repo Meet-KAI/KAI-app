@@ -10,13 +10,12 @@ const navItems = [
   { icon: Users, label: "Profile", id: "profile" },
 ];
 
-export default function Sidebar({
-  activeItem = "events",
-  onNavigate,
-}: {
+interface SidebarProps {
   activeItem?: string;
   onNavigate?: (id: string) => void;
-}) {
+}
+
+export default function Sidebar({ activeItem = "events", onNavigate }: SidebarProps) {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">KAI</div>

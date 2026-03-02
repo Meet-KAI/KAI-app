@@ -2,13 +2,12 @@ import { Calendar, MapPin, Users } from "lucide-react";
 import { Event } from "../../types/events";
 import "./EventDetail.css";
 
-export default function EventDetail({
-  event,
-  onClose,
-}: {
+interface EventDetailProps {
   event: Event;
   onClose: () => void;
-}) {
+}
+
+export default function EventDetail({ event, onClose }: EventDetailProps) {
   return (
     <div className="event-detail" onClick={(e) => e.stopPropagation()}>
       <div className="event-detail-content">

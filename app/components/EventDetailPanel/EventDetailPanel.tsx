@@ -11,6 +11,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { Event } from "../../types/events";
+import { RegisterState } from "../../types/registration";
 import { registerForEvent, unregisterFromEvent } from "../../actions/events";
 import "./EventDetailPanel.css";
 
@@ -39,41 +40,39 @@ export default function EventDetailPanel({
   onBackToTopic,
   onRegistrationChange,
 }: EventDetailPanelProps) {
-  const [registerState, setRegisterState] = useState<
-    "idle" | "loading" | "registered" | "success" | "error"
-  >("idle");
+  
+  const [registerState, setRegisterState] = useState<RegisterState>(RegisterState.Idle);
   const [registerMessage, setRegisterMessage] = useState("");
-
   const isRegistered = event ? registeredIds.has(event.id) : false;
 
   useEffect(() => {
-    setRegisterState(isRegistered ? "registered" : "idle");
+    setRegisterState(isRegistered ? RegisterState.Registered : RegisterState.Idle);
     setRegisterMessage("");
   }, [event?.id, isRegistered]);
 
   async function handleRegister() {
     if (!event) return;
-    setRegisterState("loading");
+    setRegisterState(RegisterState.Loading);
     setRegisterMessage("");
 
     if (isRegistered) {
       const result = await unregisterFromEvent(event.id);
       if (result.success) {
         onRegistrationChange(event.id, false);
-        setRegisterState("idle");
+        setRegisterState(RegisterState.Idle);
         setRegisterMessage(result.message);
       } else {
-        setRegisterState("registered");
+        setRegisterState(RegisterState.Registered);
         setRegisterMessage(result.message);
       }
     } else {
       const result = await registerForEvent(event.id);
       if (result.success) {
         onRegistrationChange(event.id, true);
-        setRegisterState("registered");
+        setRegisterState(RegisterState.Registered);
         setRegisterMessage(result.message);
       } else {
-        setRegisterState("error");
+        setRegisterState(RegisterState.Error);
         setRegisterMessage(result.message);
       }
     }
@@ -212,15 +211,15 @@ export default function EventDetailPanel({
         <button
           className={`event-detail-panel-register ${!isRegistered && event.attendees >= event.maxCapacity ? "at-capacity" : registerState}`}
           onClick={handleRegister}
-          disabled={registerState === "loading" || (!isRegistered && event.attendees >= event.maxCapacity)}
+          disabled={registerState === RegisterState.Loading || (!isRegistered && event.attendees >= event.maxCapacity)}
         >
           {!isRegistered && event.attendees >= event.maxCapacity
             ? "Event at Capacity"
-            : registerState === "loading"
+            : registerState === RegisterState.Loading
             ? "Loading..."
-            : registerState === "registered"
+            : registerState === RegisterState.Registered
             ? "Unregister"
-            : registerState === "error"
+            : registerState === RegisterState.Error
             ? "Try Again"
             : "Register"}
         </button>

@@ -1,10 +1,6 @@
-export interface UserProfile {
-  name: string;
-  email: string;
-  title: string;
-  skills: string[];
-  registeredEventIds: number[];
-}
+import { UserProfile, LearningPath } from "../types/user";
+
+export type { UserProfile, LearningPath };
 
 export const currentUser: UserProfile = {
   name: "Jason Hutchinson",
@@ -24,13 +20,6 @@ export const currentUser: UserProfile = {
   ],
   registeredEventIds: [1, 3, 11, 20, 22, 31],
 };
-
-export interface LearningPath {
-  id: number;
-  title: string;
-  description: string;
-  eventIds: number[];
-}
 
 export const learningPaths: LearningPath[] = [
   {

@@ -234,7 +234,8 @@
   color: #fff;
 }
 
-.event-detail-panel-register.at-capacity {
+.event-detail-panel-register.at-capacity,
+.event-detail-panel-register.past-event {
   background: #b0a89e;
   cursor: not-allowed;
 }

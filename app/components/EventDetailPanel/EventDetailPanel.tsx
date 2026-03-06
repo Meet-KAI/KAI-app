@@ -44,6 +44,7 @@ export default function EventDetailPanel({
   const [registerState, setRegisterState] = useState<RegisterState>(RegisterState.Idle);
   const [registerMessage, setRegisterMessage] = useState("");
   const isRegistered = event ? registeredIds.has(event.id) : false;
+  const isPastEvent = event ? new Date(event.date) < new Date() : false;
 
   useEffect(() => {
     setRegisterState(isRegistered ? RegisterState.Registered : RegisterState.Idle);
@@ -52,6 +53,7 @@ export default function EventDetailPanel({
 
   async function handleRegister() {
     if (!event) return;
+    if (!isRegistered && isPastEvent) return;
     setRegisterState(RegisterState.Loading);
     setRegisterMessage("");
 
@@ -209,11 +211,13 @@ export default function EventDetailPanel({
         </div>
 
         <button
-          className={`event-detail-panel-register ${!isRegistered && event.attendees >= event.maxCapacity ? "at-capacity" : registerState}`}
+          className={`event-detail-panel-register ${!isRegistered && isPastEvent ? "past-event" : !isRegistered && event.attendees >= event.maxCapacity ? "at-capacity" : registerState}`}
           onClick={handleRegister}
-          disabled={registerState === RegisterState.Loading || (!isRegistered && event.attendees >= event.maxCapacity)}
+          disabled={registerState === RegisterState.Loading || (!isRegistered && (isPastEvent || event.attendees >= event.maxCapacity))}
         >
-          {!isRegistered && event.attendees >= event.maxCapacity
+          {!isRegistered && isPastEvent
+            ? "Event Has Passed"
+            : !isRegistered && event.attendees >= event.maxCapacity
             ? "Event at Capacity"
             : registerState === RegisterState.Loading
             ? "Loading..."

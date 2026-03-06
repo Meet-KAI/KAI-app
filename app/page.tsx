@@ -110,7 +110,7 @@ export default function Dashboard() {
   const renderPanel = () => {
     switch (activeNav) {
       case "chat":
-        return <ChatPanel />;
+        return <ChatPanel events={events} onSelectEvent={handleSelectEvent} />;
       case "events":
         return <EventsPanel registeredIds={registeredIds} onSelectEvent={handleSelectEvent} onEventCreated={handleEventCreated} />;
       case "knowledge":
@@ -118,7 +118,7 @@ export default function Dashboard() {
       case "profile":
         return <ProfilePanel />;
       default:
-        return <ChatPanel />;
+        return <ChatPanel events={events} onSelectEvent={handleSelectEvent} />;
     }
   };
 

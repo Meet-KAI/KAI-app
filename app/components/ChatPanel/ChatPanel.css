@@ -20,6 +20,130 @@
   flex: 1;
   overflow-y: auto;
   padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #a8a096;
+}
+
+.chat-empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1715;
+  margin-bottom: 6px;
+}
+
+.chat-empty-subtitle {
+  font-size: 13px;
+}
+
+.chat-bubble {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.chat-bubble p {
+  margin: 0;
+}
+
+.chat-bubble-user {
+  align-self: flex-end;
+  background: #1a1715;
+  color: #f0ebe3;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-bubble-assistant {
+  align-self: flex-start;
+  background: #e8e2d8;
+  color: #1a1715;
+  border-bottom-left-radius: 4px;
+}
+
+.chat-bubble-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8a827a;
+  margin-bottom: 4px;
+}
+
+.chat-event-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.chat-event-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border: 1px solid #c4b89c;
+  border-radius: 8px;
+  background: #f0ebe3;
+  color: #1a1715;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.chat-event-button:hover {
+  background: #1a1715;
+  color: #f0ebe3;
+  border-color: #1a1715;
+}
+
+.chat-typing {
+  display: flex;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.chat-typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #8a827a;
+  animation: chat-typing-bounce 1.2s infinite ease-in-out;
+}
+
+.chat-typing-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.chat-typing-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes chat-typing-bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
 }
 
 .chat-input-container {

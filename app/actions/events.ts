@@ -25,10 +25,17 @@ function apiEventToFrontend(api: ApiEvent): Event {
   };
 }
 
+function formatDateForApi(isoDate: string): string {
+  const [year, month, day] = isoDate.split("-");
+  if (!year || !month || !day) return isoDate;
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
 function frontendEventToApi(event: Partial<Event>): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   if (event.title !== undefined) result.title = event.title;
-  if (event.date !== undefined) result.date = event.date;
+  if (event.date !== undefined) result.date = formatDateForApi(event.date);
   if (event.time !== undefined) result.time = event.time;
   if (event.location !== undefined) result.location = event.location;
   if (event.meetingUrl !== undefined) result.meeting_url = event.meetingUrl;
